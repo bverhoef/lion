@@ -15,7 +15,7 @@ const popupDemoStyle = css`
     padding: 8px;
   }
 
-  .demo-box_positions {
+  .demo-box_placements {
     display: flex;
     flex-direction: column;
     width: 173px;
@@ -40,6 +40,8 @@ const popupDemoStyle = css`
     background-color: black;
     border-radius: 4px;
     padding: 8px;
+    /* To display on top of elements with no z-index that are appear later in the DOM */
+    z-index: 1;
   }
 
   @media (max-width: 480px) {
@@ -57,7 +59,7 @@ storiesOf('Local Overlay System|Popup', module)
         ${popupDemoStyle}
       </style>
       <div class="demo-box">
-        <lion-popup position="right">
+        <lion-popup .placementConfig="${{ placement: 'top' }}">
           <div slot="content" class="popup">hey there</div>
           <lion-button slot="invoker">Popup</lion-button>
         </lion-popup>
@@ -65,26 +67,26 @@ storiesOf('Local Overlay System|Popup', module)
     `,
   )
   .add(
-    'positions',
+    'placements',
     () => html`
       <style>
         ${popupDemoStyle}
       </style>
-      <div class="demo-box_positions">
-        <lion-popup position="top">
-          <div slot="content" class="popup">Its top position</div>
+      <div class="demo-box_placements">
+        <lion-popup .placementConfig="${{ placement: 'top' }}">
+          <div slot="content" class="popup">Its top placement</div>
           <lion-button slot="invoker">Top</lion-button>
         </lion-popup>
-        <lion-popup position="right">
-          <div slot="content" class="popup">Its right position</div>
+        <lion-popup .placementConfig="${{ placement: 'right' }}">
+          <div slot="content" class="popup">Its right placement</div>
           <lion-button slot="invoker">Right</lion-button>
         </lion-popup>
-        <lion-popup position="bottom">
-          <div slot="content" class="popup">Its bottom position</div>
+        <lion-popup .placementConfig="${{ placement: 'bottom' }}">
+          <div slot="content" class="popup">Its bottom placement</div>
           <lion-button slot="invoker">Bottom</lion-button>
         </lion-popup>
-        <lion-popup position="left">
-          <div slot="content" class="popup">Its left position</div>
+        <lion-popup .placementConfig="${{ placement: 'left' }}">
+          <div slot="content" class="popup">Its left placement</div>
           <lion-button slot="invoker">Left</lion-button>
         </lion-popup>
       </div>

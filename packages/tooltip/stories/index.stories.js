@@ -15,7 +15,7 @@ const tooltipDemoStyle = css`
     padding: 8px;
   }
 
-  .demo-box_positions {
+  .demo-box_placements {
     display: flex;
     flex-direction: column;
     width: 173px;
@@ -40,6 +40,8 @@ const tooltipDemoStyle = css`
     background-color: black;
     border-radius: 4px;
     padding: 8px;
+    /* To display on top of elements with no z-index that are appear later in the DOM */
+    z-index: 1;
   }
 
   @media (max-width: 480px) {
@@ -57,7 +59,7 @@ storiesOf('Local Overlay System|Tooltip', module)
         ${tooltipDemoStyle}
       </style>
       <div class="demo-box">
-        <lion-tooltip position="right">
+        <lion-tooltip .placementConfig=${{ placement: 'right' }}>
           <div slot="content" class="tooltip">hey there</div>
           <lion-button slot="invoker">Tooltip</lion-button>
         </lion-tooltip>
@@ -65,26 +67,26 @@ storiesOf('Local Overlay System|Tooltip', module)
     `,
   )
   .add(
-    'positions',
+    'placements',
     () => html`
       <style>
         ${tooltipDemoStyle}
       </style>
-      <div class="demo-box_positions">
-        <lion-tooltip position="top">
-          <div slot="content" class="tooltip">Its top position</div>
+      <div class="demo-box_placements">
+        <lion-tooltip .placementConfig=${{ placement: 'top' }}>
+          <div slot="content" class="tooltip">Its top placement</div>
           <lion-button slot="invoker">Top</lion-button>
         </lion-tooltip>
-        <lion-tooltip position="right">
-          <div slot="content" class="tooltip">Its right position</div>
+        <lion-tooltip .placementConfig=${{ placement: 'right' }}>
+          <div slot="content" class="tooltip">Its right placement</div>
           <lion-button slot="invoker">Right</lion-button>
         </lion-tooltip>
-        <lion-tooltip position="bottom">
-          <div slot="content" class="tooltip">Its bottom position</div>
+        <lion-tooltip .placementConfig=${{ placement: 'bottom' }}>
+          <div slot="content" class="tooltip">Its bottom placement</div>
           <lion-button slot="invoker">Bottom</lion-button>
         </lion-tooltip>
-        <lion-tooltip position="left">
-          <div slot="content" class="tooltip">Its left position</div>
+        <lion-tooltip .placementConfig=${{ placement: 'left' }}>
+          <div slot="content" class="tooltip">Its left placement</div>
           <lion-button slot="invoker">Left</lion-button>
         </lion-tooltip>
       </div>

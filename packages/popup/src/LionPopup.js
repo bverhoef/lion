@@ -4,23 +4,34 @@ import { overlays, LocalOverlayController } from '@lion/overlays';
 export class LionPopup extends UpdatingElement {
   static get properties() {
     return {
-      position: {
-        type: String,
+      _placementConfig: {
+        type: Object,
       },
+    };
+  }
+
+  get placementConfig() {
+    return this._placementConfig;
+  }
+
+  set placementConfig(config) {
+    this._placementConfig = {
+      ...this._placementConfig,
+      ...config,
     };
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.contenNode = this.querySelector('[slot="content"]');
+    this.contentNode = this.querySelector('[slot="content"]');
     this.invokerNode = this.querySelector('[slot="invoker"]');
 
     this._popup = overlays.add(
       new LocalOverlayController({
         hidesOnEsc: true,
         hidesOnOutsideClick: true,
-        placement: this.position,
-        contentNode: this.contenNode,
+        placementConfig: this.placementConfig,
+        contentNode: this.contentNode,
         invokerNode: this.invokerNode,
       }),
     );
