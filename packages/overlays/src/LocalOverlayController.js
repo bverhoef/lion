@@ -1,20 +1,60 @@
 import { render, html } from '@lion/core';
-import { managePosition } from './utils/manage-position.js';
 import { containFocus } from './utils/contain-focus.js';
 import { keyCodes } from './utils/key-codes.js';
 
 export class LocalOverlayController {
   constructor(params = {}) {
-    const finalParams = {
+    const defaultOptions = {
       placement: 'top',
       position: 'absolute',
-      ...params,
+      modifiers: {
+        keepTogether: {
+          enabled: false,
+        },
+        preventOverflow: {
+          enabled: true,
+          boundariesElement: 'viewport',
+          padding: 16, // viewport-margin for shifting/sliding
+        },
+        flip: {
+          boundariesElement: 'viewport',
+          padding: 16, // viewport-margin for flipping
+        },
+        offset: {
+          enabled: true,
+          offset: `0, 8px`, // horizontal and vertical margin (distance between popper and referenceElement)
+        },
+        arrow: {
+          enabled: false,
+        },
+      },
     };
-    this.hidesOnEsc = finalParams.hidesOnEsc;
-    this.hidesOnOutsideClick = finalParams.hidesOnOutsideClick;
-    this.trapsKeyboardFocus = finalParams.trapsKeyboardFocus;
-    this.placement = finalParams.placement;
-    this.position = finalParams.position;
+
+    const finalPlacement = {
+      ...defaultOptions,
+      ...params.placementConfig,
+    };
+
+    let finalModifiers = defaultOptions.modifiers;
+    if (params.placementConfig) {
+      finalModifiers = {
+        ...finalModifiers,
+        ...params.placementConfig.modifiers,
+      };
+    }
+
+    this.placementConfig = {
+      placement: finalPlacement.placement,
+      position: finalPlacement.position,
+      modifiers: finalModifiers,
+    };
+
+    this.__preloadPopper();
+
+    this.hidesOnEsc = params.hidesOnEsc;
+    this.hidesOnOutsideClick = params.hidesOnOutsideClick;
+    this.trapsKeyboardFocus = params.trapsKeyboardFocus;
+
     /**
      * A wrapper to render into the invokerTemplate
      *
@@ -22,15 +62,16 @@ export class LocalOverlayController {
      */
     this.invoker = document.createElement('div');
     this.invoker.style.display = 'inline-block';
-    this.invokerTemplate = finalParams.invokerTemplate;
+    this.invokerTemplate = params.invokerTemplate;
+
     /**
      * The actual invoker element we work with - it get's all the events and a11y
      *
      * @property {HTMLElement}
      */
     this.invokerNode = this.invoker;
-    if (finalParams.invokerNode) {
-      this.invokerNode = finalParams.invokerNode;
+    if (params.invokerNode) {
+      this.invokerNode = params.invokerNode;
       this.invoker = this.invokerNode;
     }
 
@@ -41,10 +82,10 @@ export class LocalOverlayController {
      */
     this.content = document.createElement('div');
     this.content.style.display = 'inline-block';
-    this.contentTemplate = finalParams.contentTemplate;
+    this.contentTemplate = params.contentTemplate;
     this.contentNode = this.content;
-    if (finalParams.contentNode) {
-      this.contentNode = finalParams.contentNode;
+    if (params.contentNode) {
+      this.contentNode = params.contentNode;
       this.content = this.contentNode;
     }
 
@@ -71,8 +112,8 @@ export class LocalOverlayController {
    * @param {boolean} [options.isShown] whether the overlay should be shown
    * @param {object} [options.data] overlay data to pass to the content template function
    */
-  sync({ isShown, data } = {}) {
-    this._createOrUpdateOverlay(isShown, data);
+  async sync({ isShown, data } = {}) {
+    await this._createOrUpdateOverlay(isShown, data);
   }
 
   /**
@@ -94,8 +135,8 @@ export class LocalOverlayController {
   /**
    * Shows the overlay.
    */
-  show() {
-    this._createOrUpdateOverlay(true, this._prevData);
+  async show() {
+    await this._createOrUpdateOverlay(true, this._prevData);
   }
 
   /**
@@ -113,7 +154,7 @@ export class LocalOverlayController {
     this.isShown ? this.hide() : this.show();
   }
 
-  _createOrUpdateOverlay(shown = this._prevShown, data = this._prevData) {
+  async _createOrUpdateOverlay(shown = this._prevShown, data = this._prevData) {
     if (shown) {
       this._contentData = { ...this._contentData, ...data };
 
@@ -122,14 +163,17 @@ export class LocalOverlayController {
         render(this.contentTemplate(this._contentData), this.content);
         this.contentNode = this.content.firstElementChild;
       }
-      this.contentNode.style.display = 'inline-block';
       this.contentNode.id = this.contentId;
+      this.contentNode.style.display = 'inline-block';
       this.invokerNode.setAttribute('aria-expanded', true);
 
-      managePosition(this.contentNode, this.invokerNode, {
-        placement: this.placement,
-        position: this.position,
-      });
+      if (!this.popper) {
+        // Safeguard, in case module hasn't finished loading from constructor
+        if (!this.popperModule) {
+          await this.__preloadPopper();
+        }
+        this.__createPopperInstance();
+      }
 
       if (this.trapsKeyboardFocus) this._setupTrapsKeyboardFocus();
       if (this.hidesOnOutsideClick) this._setupHidesOnOutsideClick();
@@ -137,6 +181,10 @@ export class LocalOverlayController {
     } else {
       this._updateContent();
       this.invokerNode.setAttribute('aria-expanded', false);
+      if (this.popper) {
+        this.popper.destroy();
+        this.popper = null;
+      }
       if (this.hidesOnOutsideClick) this._teardownHidesOnOutsideClick();
       if (this.hidesOnEsc) this._teardownHidesOnEsc();
     }
@@ -213,5 +261,14 @@ export class LocalOverlayController {
     if (e.keyCode === keyCodes.escape) {
       this.hide();
     }
+  }
+
+  __createPopperInstance() {
+    const Popper = this.popperModule.default;
+    this.popper = new Popper(this.invokerNode, this.contentNode, this.placementConfig);
+  }
+
+  async __preloadPopper() {
+    this.popperModule = await import('popper.js/dist/popper.min.js');
   }
 }

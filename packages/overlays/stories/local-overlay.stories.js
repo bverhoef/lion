@@ -19,9 +19,32 @@ const popupDemoStyle = css`
     position: absolute;
     background-color: white;
     border-radius: 2px;
-    border: 1px solid grey;
+    /* border: 1px solid grey; */
     box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.12), 0 6px 6px 0 rgba(0, 0, 0, 0.24);
     padding: 8px;
+  }
+
+  .popper__arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+  }
+
+  .popper[x-placement^='bottom'] {
+    margin-top: 10px;
+  }
+
+  .popper[x-placement^='bottom'] .popper__arrow {
+    top: -10px;
+  }
+
+  .popper[x-placement^='top'] {
+    margin-bottom: 20px; /* now there will be 10px spacing between arrow and */
+  }
+
+  .popper[x-placement^='top'] .popper__arrow {
+    bottom: -10px;
   }
 `;
 
@@ -37,7 +60,11 @@ storiesOf('Local Overlay System|Local Overlay', module)
           `,
         invokerTemplate: () =>
           html`
+<<<<<<< HEAD
             <button @click=${() => popup.toggle()}>UK</button>
+=======
+            <button style="border: none" @click=${() => popup.show()}>UK</button>
+>>>>>>> feat(overlays): base local overlay placement on Popper.js
           `,
       }),
     );
@@ -218,6 +245,50 @@ storiesOf('Local Overlay System|Local Overlay', module)
       </style>
       <div class="demo-box">
         ${popup.invoker}${popup.content}
+      </div>
+    `;
+  })
+  .add('Override Popper modifiers', () => {
+    const popup = overlays.add(
+      new LocalOverlayController({
+        hidesOnEsc: true,
+        hidesOnOutsideClick: true,
+        placementConfig: {
+          modifiers: {
+            keepTogether: {
+              enabled: true,
+            },
+            preventOverflow: {
+              enabled: true,
+              boundariesElement: 'viewport',
+              padding: 32,
+            },
+            flip: {
+              boundariesElement: 'viewport',
+              padding: 32,
+            },
+            offset: {
+              enabled: true,
+              offset: `0, 16px`, // horizontal and vertical margin (distance between popper and referenceElement)
+            },
+          },
+        },
+        contentTemplate: () =>
+          html`
+            <div class="demo-popup">United Kingdom</div>
+          `,
+        invokerTemplate: () =>
+          html`
+            <button style="border: none" @click=${() => popup.show()}>UK</button>
+          `,
+      }),
+    );
+    return html`
+      <style>
+        ${popupDemoStyle}
+      </style>
+      <div class="demo-box">
+        In the ${popup.invoker}${popup.content} the weather is nice.
       </div>
     `;
   });
