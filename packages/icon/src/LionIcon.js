@@ -103,7 +103,7 @@ export class LionIcon extends LionLitElement {
         }
         this.innerHTML = _svg;
       }
-    }
+    });
   }
 
   _onLabelChanged() {
