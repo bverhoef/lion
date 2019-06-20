@@ -4,7 +4,7 @@ import { overlays, LocalOverlayController } from '@lion/overlays';
 export class LionPopup extends UpdatingElement {
   static get properties() {
     return {
-      _placementConfig: {
+      placementConfig: {
         type: Object,
       },
     };
@@ -19,6 +19,10 @@ export class LionPopup extends UpdatingElement {
       ...this._placementConfig,
       ...config,
     };
+
+    if (this._popup && this._popup.popper) {
+      this._popup._updatePopperConfig(this._placementConfig);
+    }
   }
 
   connectedCallback() {

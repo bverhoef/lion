@@ -154,6 +154,20 @@ export class LocalOverlayController {
     this.isShown ? this.hide() : this.show();
   }
 
+  // Popper does not export a nice method to update an existing instance with a new config. Therefore we recreate the instance.
+  // TODO: Send a merge request to Popper to abstract their logic in the constructor to an exposed method which takes in the user config.
+  updatePopperConfig(config = this.placementConfig) {
+    if (this.popper) {
+      this.popper.destroy();
+      this.popper = null;
+    }
+    this.placementConfig = {
+      ...this.placementConfig,
+      ...config,
+    };
+    this.__createPopperInstance();
+  }
+
   async _createOrUpdateOverlay(shown = this._prevShown, data = this._prevData) {
     if (shown) {
       this._contentData = { ...this._contentData, ...data };
@@ -265,7 +279,9 @@ export class LocalOverlayController {
 
   __createPopperInstance() {
     const Popper = this.popperModule.default;
-    this.popper = new Popper(this.invokerNode, this.contentNode, this.placementConfig);
+    this.popper = new Popper(this.invokerNode, this.contentNode, {
+      ...this.placementConfig,
+    });
   }
 
   async __preloadPopper() {
