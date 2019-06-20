@@ -1,4 +1,4 @@
-import { html, css, render, unsafeHTML, until } from '@lion/core';
+import { html, css } from '@lion/core';
 import { LionLitElement } from '@lion/core/src/LionLitElement.js';
 
 const isDefinedPromise = action => typeof action === 'object' && Promise.resolve(action) === action;
@@ -89,23 +89,21 @@ export class LionIcon extends LionLitElement {
    * so make sure to have <svg focusable="false"> in svg files
    */
   _setSvg() {
-    this.innerHTML = this.svg;
+    if (this.svg) {
+      this.innerHTML = this.svg;
+    }
   }
 
-  // TODO: find a better way to render dynamic icons without the need for unsafeHTML
   _setDynamicSvg() {
-    const template = html`
-      ${until(
-        this.svg.then(_svg => {
-          // If the export was not made explicit, take the default
-          if (typeof _svg !== 'string') {
-            return unsafeHTML(_svg.default);
-          }
-          return unsafeHTML(_svg);
-        }),
-      )}
-    `;
-    render(template, this);
+    this.innerHTML = '';
+    this.svg.then(_svg => {
+      if (_svg) {
+        if (typeof _svg !== 'string') {
+          this.innerHTML = _svg.default;
+        }
+        this.innerHTML = _svg;
+      }
+    }
   }
 
   _onLabelChanged() {
