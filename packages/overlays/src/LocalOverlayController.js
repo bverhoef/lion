@@ -157,9 +157,9 @@ export class LocalOverlayController {
   // Popper does not export a nice method to update an existing instance with a new config. Therefore we recreate the instance.
   // TODO: Send a merge request to Popper to abstract their logic in the constructor to an exposed method which takes in the user config.
   updatePopperConfig(config = this.placementConfig) {
-    if (this.popper) {
-      this.popper.destroy();
-      this.popper = null;
+    if (this._popper) {
+      this._popper.destroy();
+      this._popper = null;
     }
     this.placementConfig = {
       ...this.placementConfig,
@@ -181,9 +181,9 @@ export class LocalOverlayController {
       this.contentNode.style.display = 'inline-block';
       this.invokerNode.setAttribute('aria-expanded', true);
 
-      if (!this.popper) {
+      if (!this._popper) {
         // Safeguard, in case module hasn't finished loading from constructor
-        if (!this.popperModule) {
+        if (!this.__popperModule) {
           await this.__preloadPopper();
         }
         this.__createPopperInstance();
@@ -195,9 +195,9 @@ export class LocalOverlayController {
     } else {
       this._updateContent();
       this.invokerNode.setAttribute('aria-expanded', false);
-      if (this.popper) {
-        this.popper.destroy();
-        this.popper = null;
+      if (this._popper) {
+        this._popper.destroy();
+        this._popper = null;
       }
       if (this.hidesOnOutsideClick) this._teardownHidesOnOutsideClick();
       if (this.hidesOnEsc) this._teardownHidesOnEsc();
@@ -278,13 +278,13 @@ export class LocalOverlayController {
   }
 
   __createPopperInstance() {
-    const Popper = this.popperModule.default;
-    this.popper = new Popper(this.invokerNode, this.contentNode, {
+    const Popper = this.__popperModule.default;
+    this._popper = new Popper(this.invokerNode, this.contentNode, {
       ...this.placementConfig,
     });
   }
 
   async __preloadPopper() {
-    this.popperModule = await import('popper.js/dist/popper.min.js');
+    this.__popperModule = await import('popper.js/dist/popper.min.js');
   }
 }

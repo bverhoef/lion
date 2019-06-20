@@ -45,6 +45,19 @@ describe('lion-popup', () => {
       await el.updateComplete;
       expect(el.querySelector('strong')).to.not.be.undefined;
     });
+
+    it.only('should respond to dynamically changing the placementConfig', async () => {
+      const el = await fixture(html`
+        <lion-popup>
+          <div slot="content" class="popup">Hey there</div>
+          <lion-button slot="invoker">Popup button</lion-button>
+        </lion-popup>
+      `);
+      await el._popup.show();
+      expect(el._popup._popper.options.placement).to.equal('top');
+      el.placementConfig = { placement: 'left' };
+      expect(el._popup._popper.options.placement).to.equal('left');
+    });
   });
 
   describe('Accessibility', () => {

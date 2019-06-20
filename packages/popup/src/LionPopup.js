@@ -20,8 +20,8 @@ export class LionPopup extends UpdatingElement {
       ...config,
     };
 
-    if (this._popup && this._popup.popper) {
-      this._popup._updatePopperConfig(this._placementConfig);
+    if (this._popup && this._popup._popper) {
+      this._popup.updatePopperConfig(this._placementConfig);
     }
   }
 

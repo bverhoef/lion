@@ -215,11 +215,11 @@ describe('LocalOverlayController', () => {
           `,
       });
       await controller.show();
-      expect(controller.popper)
+      expect(controller._popper)
         .to.be.an.instanceof(Popper)
         .and.have.property('modifiers');
       controller.hide();
-      expect(controller.popper).to.be.null;
+      expect(controller._popper).to.be.null;
     });
 
     it('positions correctly', async () => {
@@ -348,8 +348,8 @@ describe('LocalOverlayController', () => {
 
       await controller.show();
       await nextFrame(); // TODO: check if still necessary
-      const keepTogether = controller.popper.modifiers.find(item => item.name === 'keepTogether');
-      const offset = controller.popper.modifiers.find(item => item.name === 'offset');
+      const keepTogether = controller._popper.modifiers.find(item => item.name === 'keepTogether');
+      const offset = controller._popper.modifiers.find(item => item.name === 'offset');
       expect(keepTogether.enabled).to.be.false;
       expect(offset.enabled).to.be.true;
       expect(offset.offset).to.equal('0, 16px');
