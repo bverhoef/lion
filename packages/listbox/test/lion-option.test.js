@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
-import '../lion-listbox.js';
+import '../lion-base-listbox.js';
 
 describe('lion-option', () => {
   it('uses value attribute to set the value', async () => {

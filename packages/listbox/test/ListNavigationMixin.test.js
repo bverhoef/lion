@@ -2,7 +2,7 @@ import { expect, fixture, html, defineCE } from '@open-wc/testing';
 import { keyUpOn } from '@polymer/iron-test-helpers/mock-interactions.js';
 import { LionLitElement } from '@lion/core/src/LionLitElement.js';
 
-import '../ListNavigationMixin.js';
+import ListNavigationMixin from '../src/ListBoxBehavior.js';
 import '../lion-option.js';
 
 const keyCodes = {

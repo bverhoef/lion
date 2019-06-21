@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { keyUpOn } from '@polymer/iron-test-helpers/mock-interactions.js';
 
-import '../lion-listbox.js';
+import '../lion-base-listbox.js';
 import '../lion-option.js';
 
 const keyCodes = {
